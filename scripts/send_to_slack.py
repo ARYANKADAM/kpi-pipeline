@@ -42,6 +42,10 @@ def build_summary_message(report):
 
 
 def send_to_slack(filepath, message):
+    if not SLACK_BOT_TOKEN or not SLACK_CHANNEL:
+        print("⚠️ Slack credentials are missing. Skipping Slack delivery.")
+        return
+
     client = WebClient(token=SLACK_BOT_TOKEN)
     try:
         # Post the summary message first
@@ -56,7 +60,11 @@ def send_to_slack(filepath, message):
         print(f"✅ Report sent to Slack channel {SLACK_CHANNEL}")
 
     except SlackApiError as e:
-        print(f"❌ Slack API error: {e.response['error']}")
+        error_code = e.response.get("error")
+        print(f"❌ Slack API error: {error_code}")
+        if error_code in {"invalid_auth", "not_authed"}:
+            print("⚠️ Slack authentication failed. Continuing without Slack delivery.")
+            return
         raise
 
 
