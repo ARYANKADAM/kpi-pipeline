@@ -1,0 +1,19 @@
+# Secrets - never commit these
+.env
+
+# Python
+__pycache__/
+*.pyc
+venv/
+.venv/
+
+# Generated reports (optional - remove this line if you DO want sample reports in the repo)
+reports/*.xlsx
+
+# Airflow runtime files
+airflow/logs/
+airflow/plugins/__pycache__/
+
+# OS files
+.DS_Store
+Thumbs.db
