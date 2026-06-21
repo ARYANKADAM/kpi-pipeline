@@ -63,7 +63,7 @@ with DAG(
     description="Pulls sales data, computes weekly KPIs, generates Excel report, sends to Slack",
     default_args=default_args,
     start_date=datetime(2026, 1, 1),
-    schedule_interval="0 8 * * MON",   # every Monday at 8:00 AM
+    schedule_interval="0 8 * * MON",   # every Monday at 8:00 AM | 0 8 * * MON
     catchup=False,
     tags=["kpi", "reporting", "slack"],
 ) as dag:

@@ -6,14 +6,18 @@ Run this whenever you want to (re)load the dataset.
 
 import pandas as pd
 from sqlalchemy import create_engine
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 # ---- CONFIG ----
-CSV_PATH = "../data/Sample-Superstore_csv.csv"   # update path if needed
-DB_USER = "postgres"
-DB_PASSWORD = "yourpassword"             # match what you used in `docker run`
-DB_HOST = "localhost"
-DB_PORT = "5433"                         # we mapped kpi-postgres to 5433
-DB_NAME = "kpi_db"
+CSV_PATH = "../data/Sample-Superstore_csv.csv"
+DB_USER = os.environ.get("KPI_DB_USER", "postgres")
+DB_PASSWORD = os.environ.get("KPI_DB_PASSWORD", "")
+DB_HOST = os.environ.get("KPI_DB_HOST", "localhost")
+DB_PORT = os.environ.get("KPI_DB_PORT", "5433")
+DB_NAME = os.environ.get("KPI_DB_NAME", "kpi_db")
 
 def main():
     # 1. Read CSV
@@ -29,9 +33,9 @@ def main():
     df["order_date"] = pd.to_datetime(df["order_date"], dayfirst=True)
     df["ship_date"] = pd.to_datetime(df["ship_date"], dayfirst=True)
 
-    # 4. Connect to Postgres
+    # 4. Connect to Postgres (sslmode=require needed for Neon)
     engine = create_engine(
-        f"postgresql+psycopg2://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
+        f"postgresql+psycopg2://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}?sslmode=require"
     )
 
     # 5. Push to DB (replace table each time for a clean reload)
