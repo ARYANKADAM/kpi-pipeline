@@ -42,6 +42,10 @@ def build_summary_message(report):
 
 
 def send_to_slack(filepath, message):
+    if not SLACK_BOT_TOKEN or not SLACK_CHANNEL:
+        print("⚠️ Slack token/channel not set. Skipping Slack delivery.")
+        return False
+
     client = WebClient(token=SLACK_BOT_TOKEN)
     try:
         # Post the summary message first
@@ -54,9 +58,14 @@ def send_to_slack(filepath, message):
             title="Weekly KPI Report",
         )
         print(f"✅ Report sent to Slack channel {SLACK_CHANNEL}")
+        return True
 
     except SlackApiError as e:
-        print(f"❌ Slack API error: {e.response['error']}")
+        error_code = e.response.get("error", "unknown_error")
+        print(f"❌ Slack API error: {error_code}")
+        if error_code in {"invalid_auth", "not_authed"}:
+            print("⚠️ Slack authentication failed. Continuing without failing the pipeline.")
+            return False
         raise
 
 
